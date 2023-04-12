@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: mypod
+spec:
+ replicas: 1
+ selector:
+  matchLabels:
+   app: web
+ template:
+  metadata:
+   name: mypod
+   labels: 
+    app: web 
+  spec:
+   volumes:
+   - name: webdata
+     emptyDir: {}
+   initContainers:
+      - name: web-content
+        image: busybox
+        volumeMounts:
+        - name: webdata
+          mountPath: "/webdata"
+        #command: ["/bin/sh", "-c", 'echo "<h1><font color=Red>NO APP</font></h1>" >> /webdata/index.html' ]
+        #command: ["/bin/sh", "-c", 'echo "<h2><font color=Green>BLOG POST</font></h2>" >> /webdata/index.html']
+        command: 
+        - /bin/sh
+        - -c
+        - |
+           echo "<h1><font color=Green>NO APP</font></h1>" >> /webdata/index.html;
+           echo "<h2><font color=Red>NO@ APP</font></h2>" >> /webdata/index.html;
+   containers:
+   - image: nginx
+     name: nginx
+     ports:
+     - containerPort: 80
+     volumeMounts:
+     - name: webdata
+       mountPath: "/usr/share/nginx/html"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: nginx
+spec: 
+ replicas: 1
+ selector:
+  matchLabels: 
+   app: web1
+ template:
+  metadata: 
+   name: web1
+   labels:
+    app: web1
+  spec:
+   volumes:
+   - name: webdata
+     emptyDir: {}
+   initContainers:
+   - name: webcontetn
+     image: busybox
+     command:
+     - /bin/sh
+     - -c
+     - |
+       echo "<h1><font color=Cyan>Second APP</font></h1>" >> /webdata/index.html;
+       echo "<h2><font color=Red>Second@ APP</font></h2>" >> /webdata/index.html;
+     volumeMounts:
+     - name: webdata
+       mountPath: "/webdata"
+   containers:
+   - name: nginx
+     image: nginx
+     ports:
+     - containerPort: 80
+     volumeMounts:
+     - name: webdata
+       mountPath: "/usr/share/nginx/html/"

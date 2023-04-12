@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: svc 
+spec:
+ type: ClusterIP
+ ports:
+ - targetPort: 80
+   port: 80
+ selector:
+  app: web
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: svc3
+spec:
+ type: ClusterIP
+ ports:
+ - targetPort: 80
+   port: 80
+ selector:
+  app: web1
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-ingress
+spec:
+  type: LoadBalancer
+  selector:
+    app: myingress
+  ports:
+    - port: 80
+      targetPort: 80
